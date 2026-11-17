@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#181B26" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Template Count">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233B3FD8'/%3E%3Ctext x='32' y='44' font-family='Arial' font-weight='700' font-size='34' fill='white' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%233B3FD8'/%3E%3Ctext x='32' y='44' font-family='Arial' font-weight='700' font-size='34' fill='white' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
 <title>Template Count Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -205,9 +212,139 @@ kbd{font-family:var(--f-num);font-size:12px;border:1px solid var(--line);border-
 .gate-box input{width:100%;font-size:18px;letter-spacing:.2em}
 body.team .admin-only{display:none!important}
 
+.short{display:none}
+
 @media (max-width:980px){ .tiles{grid-template-columns:1fr 1fr} }
 @media (max-width:820px){ .grid2,.grid2e{grid-template-columns:1fr} }
-@media (max-width:520px){ .tiles{grid-template-columns:1fr} .nav .label{min-width:0} }
+@media (hover:none){ .kbd-hint{display:none} tbody tr:hover td{background:transparent} tr.lead:hover td{background:var(--gold-bg)} }
+
+/* ---------- phones ---------- */
+@media (max-width:640px){
+  body{font-size:15px}
+  .top-in{padding:calc(8px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px));gap:4px}
+  h1{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  h2{font-size:19px}
+  .logo{width:28px;height:28px;font-size:13px}
+  .brand .nav{gap:2px;flex-wrap:nowrap}
+  .sync{font-size:11px;padding:2px 8px}
+  .full{display:none} .short{display:inline}
+  .tabs{margin:0 -12px;padding:0 6px}
+  .tabs a{padding:10px 10px;font-size:14px}
+  .wrap{padding:16px max(12px,env(safe-area-inset-right,0px)) calc(80px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+  .view{gap:16px}
+  .panel,.tile{border-radius:12px}
+  .panel-h{padding:12px 14px}
+  .panel-b{padding:14px}
+  .hint{font-size:12.5px}
+
+  /* week / day navigation: one full-width row */
+  .bar{flex-direction:column;align-items:stretch;gap:10px}
+  .bar .nav{display:grid;grid-template-columns:44px 1fr 44px auto;gap:6px}
+  .bar .nav button,.bar .nav input{min-height:44px;width:100%}
+  .bar .nav input[type=date]{text-align:center}
+  .bar .nav.rp-actions{grid-template-columns:1fr 1fr}
+
+  /* summary tiles: prize full width, others in two columns */
+  .tiles{grid-template-columns:1fr 1fr;gap:10px}
+  .tile{padding:12px 14px;gap:4px}
+  .tile.prize{grid-column:1 / -1}
+  .big{font-size:20px}
+  .tile .muted{font-size:13px;line-height:1.4}
+  .tile.prize .big{font-size:22px}
+  .banner{padding:10px 12px;font-size:14px}
+
+  /* tables become cards */
+  .cards table,.cards tbody,.cards tfoot{display:block}
+  .cards thead{display:none}
+  .cards td{border:0;padding:0;white-space:normal}
+  .cards tr{border-bottom:1px solid var(--line)}
+  .cards tbody tr:last-child{border-bottom:0}
+  .cards tfoot tr{border-top:2px solid var(--line);background:var(--surface-2)}
+  .cards tfoot td{border:0;background:transparent}
+  [data-label]::before{content:attr(data-label);display:block;font-family:var(--f-body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px}
+
+  /* leaderboard card */
+  #board tr{display:grid;grid-template-columns:repeat(7,1fr);gap:8px 4px;padding:12px 14px;align-items:center}
+  #board td.rank{grid-row:1;grid-column:1;width:auto;font-size:13px}
+  #board td.nm{grid-row:1;grid-column:2 / 6;min-width:0}
+  #board td.nm .who strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #board td.nm .crown{display:none}
+  #board td.net{grid-row:1;grid-column:6 / 8}
+  #board td.net .meter{display:none}
+  #board td.net .extra-num{font-size:18px}
+  #board td.day{grid-row:2;min-width:0;padding:6px 0;border-radius:6px;background:var(--surface-2);text-align:center;font-size:13px}
+  #board td.day.offcell{background:var(--off)}
+  #board td.day::before{content:attr(data-d);display:block;font-family:var(--f-body);font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase}
+  #board tr.lead{background:var(--gold-bg)}
+  #board tr.lead td,#board tr.lead:hover td{background:transparent}
+  #board tr.lead td.day{background:color-mix(in srgb,var(--gold) 12%,transparent)}
+  .kbd-hint{display:none}
+  .tile.lead-tile{grid-column:1 / -1}
+  .cards input[type=number]{text-align:center}
+  #designerList td.fld{text-align:left}
+  #designerList td.st .chip{margin-bottom:0}
+  #board td.iv{grid-row:3;text-align:left;font-size:14px}
+  #board td.iv.i1{grid-column:1 / 5}
+  #board td.iv.i2{grid-column:5 / 8}
+  .legend{padding:10px 14px;gap:6px 12px;font-size:12px}
+
+  /* daily log card */
+  #daySheet tr{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+  #daySheet td.nm{grid-column:1;grid-row:1;min-width:0;align-self:center}
+  #daySheet td.act{grid-column:2;grid-row:1;text-align:right;align-self:center}
+  #daySheet td.act:empty{display:none}
+  #daySheet td.fld{text-align:left}
+  #daySheet td.fld input{width:100%;min-height:46px;font-size:18px;text-align:center}
+  #daySheet td.res{grid-column:1 / -1}
+  #daySheet td.res:empty{display:none}
+  #daySheet tfoot tr{grid-template-columns:repeat(4,1fr);gap:6px}
+  #daySheet tfoot td{text-align:left!important;font-size:15px}
+  #daySheet tfoot td.tl{grid-column:1 / -1;font-family:var(--f-display);font-size:15px}
+  #daySheet tfoot td.res{grid-column:1 / -1}
+  #daySheet tfoot td.act{display:none}
+
+  /* weekly report card */
+  .report-top{padding:14px;gap:12px}
+  .report-top .big{font-size:20px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;width:100%}
+  .stat .v{font-size:18px}
+  #report tbody tr,#report tfoot tr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 12px;padding:14px}
+  #report td{text-align:left!important;font-size:15px}
+  #report td.nm{grid-column:1 / -1}
+  #report tr.lead{background:var(--gold-bg)}
+  #report tr.lead td,#report tr.lead:hover td{background:transparent}
+  #report td.nm .who{flex-wrap:wrap}
+
+  /* designers list card */
+  #designerList tr{display:grid;grid-template-columns:1fr 1fr 64px;gap:10px;padding:14px;align-items:end}
+  #designerList td.nm{grid-column:1 / -1}
+  #designerList td.nm input{flex:1;min-width:0;font-weight:600}
+  #designerList td.fld input{width:100%;min-height:44px;font-size:16px}
+  #designerList td.wins{text-align:left!important}
+  #designerList td.st{grid-column:1 / -1}
+  #designerList td.st .chip{margin-bottom:8px}
+  #designerList td.acts{grid-column:1 / -1}
+  #designerList td.acts .nav{justify-content:stretch!important;display:grid;grid-template-columns:1fr 1fr}
+  #designerList td.acts button{min-height:40px}
+
+  /* forms */
+  .row{gap:10px}
+  .row>.field{flex:1 1 calc(50% - 5px)}
+  .row>.field.grow{flex:1 1 100%}
+  .row>button{flex:1 1 100%;min-height:46px}
+  .form input[type=text],.form input[type=date],.form select,.form input[type=number]{width:100%;min-height:44px;font-size:16px}
+  .days{display:grid;grid-template-columns:repeat(2,1fr)}
+  .days label{min-height:44px}
+  .list li{padding:12px 14px}
+  .list li button{min-height:36px}
+  .empty{padding:18px 14px}
+  .rules{font-size:13px}
+  #toast{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:360px){
+  .tiles{grid-template-columns:1fr}
+  #report tbody tr,#report tfoot tr{grid-template-columns:1fr 1fr}
+}
 
 @media print{
   body{background:#fff;color:#000}
@@ -234,10 +371,10 @@ body.team .admin-only{display:none!important}
     </div>
     <nav class="tabs" aria-label="Sections">
       <a href="#overview">Overview</a>
-      <a href="#log">Daily log <span class="badge" id="missBadge" hidden></span></a>
-      <a href="#report">Weekly report</a>
-      <a href="#designers" class="admin-only">Designers</a>
-      <a href="#holidays" class="admin-only">Holidays &amp; leave</a>
+      <a href="#log"><span class="full">Daily log</span><span class="short">Log</span> <span class="badge" id="missBadge" hidden></span></a>
+      <a href="#report"><span class="full">Weekly report</span><span class="short">Report</span></a>
+      <a href="#designers" class="admin-only"><span class="full">Designers</span><span class="short">Team</span></a>
+      <a href="#holidays" class="admin-only"><span class="full">Holidays &amp; leave</span><span class="short">Holidays</span></a>
       <a href="#settings" class="admin-only">Settings</a>
     </nav>
   </div>
@@ -262,7 +399,7 @@ body.team .admin-only{display:none!important}
         <div class="big" id="prizeText">No prize set yet</div>
         <div class="muted" id="prizeSub"></div>
       </div>
-      <div class="tile">
+      <div class="tile lead-tile">
         <div class="eyebrow" id="leaderLabel">Leading</div>
         <div class="big" id="leaderName">Nobody yet</div>
         <div class="muted" id="leaderSub"></div>
@@ -284,9 +421,9 @@ body.team .admin-only{display:none!important}
     <div class="panel">
       <div class="panel-h">
         <h3>Leaderboard</h3>
-        <span class="hint">Ranked by net extra images. Hover a day for details.</span>
+        <span class="hint">Ranked by net extra images.<span class="kbd-hint"> Hover a day for details.</span></span>
       </div>
-      <div class="scroll" id="board"></div>
+      <div class="scroll cards" id="board"></div>
       <div class="legend">
         <span><b class="d-up">+2</b> above image target</span>
         <span><b class="d-short">−1</b> below target, deducted</span>
@@ -329,9 +466,9 @@ body.team .admin-only{display:none!important}
     </div>
     <div id="dayBanner"></div>
     <div class="panel">
-      <div class="scroll" id="daySheet"></div>
+      <div class="scroll cards" id="daySheet"></div>
     </div>
-    <p class="hint noprint">Each box saves when you leave it. Press <kbd>Enter</kbd> to jump to the next designer. Use <kbd>←</kbd> <kbd>→</kbd> to change day and <kbd>T</kbd> for today.</p>
+    <p class="hint noprint">Each box saves when you leave it.<span class="kbd-hint"> Press <kbd>Enter</kbd> to jump to the next designer. Use <kbd>←</kbd> <kbd>→</kbd> to change day and <kbd>T</kbd> for today.</span></p>
   </section>
 
   <!-- REPORT -->
@@ -342,11 +479,13 @@ body.team .admin-only{display:none!important}
         <button class="icon" data-week="-1" aria-label="Previous week">‹</button>
         <button data-week="0">This week</button>
         <button class="icon" data-week="1" aria-label="Next week">›</button>
+      </div>
+      <div class="nav rp-actions noprint">
         <button id="csvBtn">Export CSV</button>
         <button id="printBtn">Print</button>
       </div>
     </div>
-    <div class="panel" id="report"></div>
+    <div class="panel cards" id="report"></div>
   </section>
 
   <!-- DESIGNERS -->
@@ -367,7 +506,7 @@ body.team .admin-only{display:none!important}
     </div>
     <div class="panel">
       <div class="panel-h"><h3>Team list</h3><span class="hint">Changing a target applies to days not logged yet. Logged days keep their target.</span></div>
-      <div class="scroll" id="designerList"></div>
+      <div class="scroll cards" id="designerList"></div>
     </div>
   </section>
 
@@ -776,6 +915,8 @@ body.team .admin-only{display:none!important}
     if (role === "team" && ["designers", "holidays", "settings"].includes(view)) view = "overview";
     $$(".view").forEach(v => { const on = v.dataset.view === view; v.hidden = !on; v.classList.toggle("active", on); });
     $$(".tabs a").forEach(a => { if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    const cur = $(".tabs a[aria-current]"), tabs = $(".tabs");
+    if (cur && tabs.scrollWidth > tabs.clientWidth) tabs.scrollLeft = cur.offsetLeft - (tabs.clientWidth - cur.offsetWidth) / 2;
     render();
   }
   window.addEventListener("hashchange", route);
@@ -853,7 +994,7 @@ body.team .admin-only{display:none!important}
     const mark = t.type === "leave" ? "L" : t.type === "holiday" ? "H" : t.type === "off" ? "·" : "";
     return `<td class="c day d-none${offCls}" title="${esc(title)}">${mark || "–"}</td>`;
   }
-  const ofCell = (n, t, has) => has ? `<td class="r num">${n} <span class="of">/ ${t}</span></td>` : `<td class="r num of">–</td>`;
+  const ofCell = (n, t, has, cls, label) => has ? `<td class="r num iv ${cls}" data-label="${label}">${n} <span class="of">/ ${t}</span></td>` : `<td class="r num of iv ${cls}" data-label="${label}">–</td>`;
 
   function renderBoard(st, ws, final) {
     const { days, rows, top } = st;
@@ -869,11 +1010,11 @@ body.team .admin-only{display:none!important}
       const lead = top > 0 && r.extra === top;
       return `<tr class="${lead ? "lead" : ""}">
         <td class="rank">${i + 1}</td>
-        <td>${who(r.id, r.name, lead ? `<span class="crown">${final ? "Winner" : "Leading"}</span>` : "")}</td>
-        ${r.cells.map(dayCell).join("")}
-        ${ofCell(r.img, r.imgT, r.imgDays)}
-        ${ofCell(r.vid, r.vidT, r.vidDays)}
-        <td><div class="extra-cell"><span class="meter"><i style="width:${(Math.max(0, r.extra) / max) * 100}%"></i></span><span class="extra-num ${r.extra < 0 ? "d-short" : ""}">${signed(r.extra)}</span></div></td>
+        <td class="nm">${who(r.id, r.name, lead ? `<span class="crown">${final ? "Winner" : "Leading"}</span>` : "")}</td>
+        ${r.cells.map((c, j) => dayCell(c).replace("<td ", `<td data-d="${DOW[j]}" `)).join("")}
+        ${ofCell(r.img, r.imgT, r.imgDays, "i1", "Images / target")}
+        ${ofCell(r.vid, r.vidT, r.vidDays, "i2", "Videos / target")}
+        <td class="net"><div class="extra-cell"><span class="meter"><i style="width:${(Math.max(0, r.extra) / max) * 100}%"></i></span><span class="extra-num ${r.extra < 0 ? "d-short" : ""}">${signed(r.extra)}</span></div></td>
       </tr>`;
     }).join("");
     $("#board").innerHTML = `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
@@ -920,14 +1061,14 @@ body.team .admin-only{display:none!important}
         <tr><th>Designer</th><th class="r">Target</th><th class="r">Made</th><th class="r">Target</th><th class="r">Made</th><th>Result</th><th class="noprint"></th></tr></thead><tbody>${
         list.map(([id, d]) => { const dt = dayType(selDate, id), work = dt.type === "work";
           return `<tr data-id="${esc(id)}" class="${work ? "" : "dim"}">
-          <td>${who(id, d.name)}</td>
-          <td class="r"><input type="number" min="0" step="1" id="it-${esc(id)}" data-kind="it" aria-label="Image target for ${esc(d.name)}" ${work && admin ? "" : "disabled"}></td>
-          <td class="r"><input type="number" min="0" step="1" id="im-${esc(id)}" data-kind="im" aria-label="Images made by ${esc(d.name)}" placeholder="–"></td>
-          <td class="r"><input type="number" min="0" step="1" id="vt-${esc(id)}" data-kind="vt" class="vid" aria-label="Video target for ${esc(d.name)}" ${work && admin ? "" : "disabled"}></td>
-          <td class="r"><input type="number" min="0" step="1" id="vm-${esc(id)}" data-kind="vm" class="vid" aria-label="Videos made by ${esc(d.name)}" placeholder="–"></td>
-          <td><div class="chips" id="res-${esc(id)}"></div></td>
-          <td class="r noprint">${admin && (dt.type === "leave" || work) ? `<button type="button" class="sm ghost" data-act="leave">${dt.type === "leave" ? "Remove leave" : "Mark leave"}</button>` : ""}</td></tr>`; }).join("")
-      }</tbody><tfoot><tr><td>Day total</td><td class="r num" id="tot-it"></td><td class="r num" id="tot-im"></td><td class="r num" id="tot-vt"></td><td class="r num" id="tot-vm"></td><td id="tot-x"></td><td class="noprint"></td></tr></tfoot></table>`;
+          <td class="nm">${who(id, d.name)}</td>
+          <td class="r fld" data-label="Image target"><input type="number" inputmode="numeric" min="0" step="1" id="it-${esc(id)}" data-kind="it" aria-label="Image target for ${esc(d.name)}" ${work && admin ? "" : "disabled"}></td>
+          <td class="r fld" data-label="Images made"><input type="number" inputmode="numeric" min="0" step="1" id="im-${esc(id)}" data-kind="im" aria-label="Images made by ${esc(d.name)}" placeholder="–"></td>
+          <td class="r fld" data-label="Video target"><input type="number" inputmode="numeric" min="0" step="1" id="vt-${esc(id)}" data-kind="vt" class="vid" aria-label="Video target for ${esc(d.name)}" ${work && admin ? "" : "disabled"}></td>
+          <td class="r fld" data-label="Videos made"><input type="number" inputmode="numeric" min="0" step="1" id="vm-${esc(id)}" data-kind="vm" class="vid" aria-label="Videos made by ${esc(d.name)}" placeholder="–"></td>
+          <td class="res"><div class="chips" id="res-${esc(id)}"></div></td>
+          <td class="r noprint act">${admin && (dt.type === "leave" || work) ? `<button type="button" class="sm ghost" data-act="leave">${dt.type === "leave" ? "Remove leave" : "Mark leave"}</button>` : ""}</td></tr>`; }).join("")
+      }</tbody><tfoot><tr><td class="tl">Day total</td><td class="r num" id="tot-it" data-label="Img target"></td><td class="r num" id="tot-im" data-label="Images"></td><td class="r num" id="tot-vt" data-label="Vid target"></td><td class="r num" id="tot-vm" data-label="Videos"></td><td id="tot-x" class="res"></td><td class="noprint act"></td></tr></tfoot></table>`;
     }
     const setVal = (el, v) => { if (el && document.activeElement !== el) el.value = v; };
     let tIt = 0, tIm = 0, tVt = 0, tVm = 0, tX = 0;
@@ -1039,19 +1180,19 @@ body.team .admin-only{display:none!important}
           <th class="r">Earned</th><th class="r">Deducted</th><th class="r">Net</th></tr>
         </thead>
         <tbody>${used.map(r => `<tr class="${top > 0 && r.extra === top ? "lead" : ""}">
-          <td>${who(r.id, r.name, r.leaveDays ? `<span class="chip off">${plural(r.leaveDays, "leave day")}</span>` : "")}</td>
-          <td class="r num">${r.img}</td><td class="r num">${r.imgT}</td>
-          <td class="r num">${r.hitDays} <span class="of">days</span></td>
-          <td class="r num ${r.shortDays ? "d-short" : ""}">${r.shortDays} <span class="of">days</span></td>
-          <td class="r num ${r.missDays ? "d-miss" : ""}">${r.missDays || "–"}</td>
-          <td class="r num">${r.vidDays ? r.vid : "–"}</td><td class="r num">${r.vidDays ? r.vidT : "–"}</td>
-          <td class="r num">${pct(r.vid, r.vidT)}</td>
-          <td class="r num d-up">${r.plus ? "+" + r.plus : "0"}</td>
-          <td class="r num ${r.minus ? "d-short" : ""}">${r.minus ? "−" + r.minus : "0"}</td>
-          <td class="r num ${r.extra < 0 ? "d-short" : ""}" style="font-weight:700">${signed(r.extra)}</td></tr>`).join("")}</tbody>
-        <tfoot><tr><td>Team</td><td class="r num">${sum("img")}</td><td class="r num">${sum("imgT")}</td><td class="r num">${sum("hitDays")}</td><td class="r num">${sum("shortDays")}</td><td class="r num">${sum("missDays") || "–"}</td>
-          <td class="r num">${sum("vid")}</td><td class="r num">${sum("vidT")}</td><td class="r num">${pct(sum("vid"), sum("vidT"))}</td>
-          <td class="r num">+${sum("plus")}</td><td class="r num">−${sum("minus")}</td><td class="r num">${signed(sum("extra"))}</td></tr></tfoot>
+          <td class="nm">${who(r.id, r.name, r.leaveDays ? `<span class="chip off">${plural(r.leaveDays, "leave day")}</span>` : "")}</td>
+          <td class="r num" data-label="Images">${r.img}</td><td class="r num" data-label="Img target">${r.imgT}</td>
+          <td class="r num" data-label="On target">${r.hitDays} <span class="of">${r.hitDays === 1 ? "day" : "days"}</span></td>
+          <td class="r num ${r.shortDays ? "d-short" : ""}" data-label="Short">${r.shortDays} <span class="of">${r.shortDays === 1 ? "day" : "days"}</span></td>
+          <td class="r num ${r.missDays ? "d-miss" : ""}" data-label="Missing">${r.missDays || "–"}</td>
+          <td class="r num" data-label="Videos">${r.vidDays ? r.vid : "–"}</td><td class="r num" data-label="Vid target">${r.vidDays ? r.vidT : "–"}</td>
+          <td class="r num" data-label="Achieved">${pct(r.vid, r.vidT)}</td>
+          <td class="r num d-up" data-label="Earned">${r.plus ? "+" + r.plus : "0"}</td>
+          <td class="r num ${r.minus ? "d-short" : ""}" data-label="Deducted">${r.minus ? "−" + r.minus : "0"}</td>
+          <td class="r num ${r.extra < 0 ? "d-short" : ""}" style="font-weight:700" data-label="Net extra">${signed(r.extra)}</td></tr>`).join("")}</tbody>
+        <tfoot><tr><td class="nm"><strong>Team total</strong></td><td class="r num" data-label="Images">${sum("img")}</td><td class="r num" data-label="Img target">${sum("imgT")}</td><td class="r num" data-label="On target">${sum("hitDays")}</td><td class="r num" data-label="Short">${sum("shortDays")}</td><td class="r num" data-label="Missing">${sum("missDays") || "–"}</td>
+          <td class="r num" data-label="Videos">${sum("vid")}</td><td class="r num" data-label="Vid target">${sum("vidT")}</td><td class="r num" data-label="Achieved">${pct(sum("vid"), sum("vidT"))}</td>
+          <td class="r num" data-label="Earned">+${sum("plus")}</td><td class="r num" data-label="Deducted">−${sum("minus")}</td><td class="r num" data-label="Net extra">${signed(sum("extra"))}</td></tr></tfoot>
       </table></div>`;
   }
   $("#report").addEventListener("click", e => { if (e.target.dataset.act === "preview") { previewWeek = weekStart(selDate); renderReport(); } });
@@ -1084,12 +1225,12 @@ body.team .admin-only{display:none!important}
       listKey = key;
       $("#designerList").innerHTML = all.length ? `<table><thead><tr><th>Name</th><th class="r img">Images / day</th><th class="r vidh">Videos / day</th><th class="r">Wins</th><th>Status</th><th></th></tr></thead><tbody>${
         all.map(([id, d]) => `<tr data-id="${esc(id)}" class="${d.active === false ? "dim" : ""}">
-          <td><div class="who">${av(id, d.name)}<input type="text" id="dn-${esc(id)}" data-kind="name" maxlength="60" aria-label="Name"></div></td>
-          <td class="r"><input type="number" min="0" step="1" id="di-${esc(id)}" data-kind="imageTarget" aria-label="Daily image target for ${esc(d.name)}"></td>
-          <td class="r"><input type="number" min="0" step="1" id="dv-${esc(id)}" data-kind="videoTarget" class="vid" aria-label="Daily video target for ${esc(d.name)}"></td>
-          <td class="r num" id="dw-${esc(id)}"></td>
-          <td>${d.active === false ? '<span class="chip off">Off the board</span>' : '<span class="chip on">Active</span>'}</td>
-          <td class="r"><div class="nav" style="justify-content:flex-end">
+          <td class="nm"><div class="who">${av(id, d.name)}<input type="text" id="dn-${esc(id)}" data-kind="name" maxlength="60" aria-label="Name"></div></td>
+          <td class="r fld" data-label="Images / day"><input type="number" inputmode="numeric" min="0" step="1" id="di-${esc(id)}" data-kind="imageTarget" aria-label="Daily image target for ${esc(d.name)}"></td>
+          <td class="r fld" data-label="Videos / day"><input type="number" inputmode="numeric" min="0" step="1" id="dv-${esc(id)}" data-kind="videoTarget" class="vid" aria-label="Daily video target for ${esc(d.name)}"></td>
+          <td class="r num wins" id="dw-${esc(id)}" data-label="Wins"></td>
+          <td class="st">${d.active === false ? '<span class="chip off">Off the board</span>' : '<span class="chip on">Active</span>'}</td>
+          <td class="r acts"><div class="nav" style="justify-content:flex-end">
             <button type="button" class="sm" data-act="toggle">${d.active === false ? "Put back" : "Take off board"}</button>
             <button type="button" class="sm danger" data-act="delete">Delete</button></div></td></tr>`).join("")
       }</tbody></table>` : `<div class="empty">No designers yet. Add the first one above.</div>`;
@@ -1254,7 +1395,8 @@ body.team .admin-only{display:none!important}
   function applyTheme() {
     const t = prefs.theme;
     if (t === "system") document.documentElement.removeAttribute("data-theme"); else document.documentElement.dataset.theme = t;
-    $("#themeBtn").textContent = `Theme: ${t[0].toUpperCase() + t.slice(1)}`;
+    $("#themeBtn").innerHTML = `<span class="full">Theme: ${t[0].toUpperCase() + t.slice(1)}</span><span class="short" aria-hidden="true">${{ system: "◐", light: "☀", dark: "☾" }[t]}</span>`;
+    $("#themeBtn").setAttribute("aria-label", `Colour theme: ${t}. Click to change.`);
   }
   $("#themeBtn").onclick = () => {
     const order = ["system", "light", "dark"];
