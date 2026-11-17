@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Template Count Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: sticky top bar with tabs; each tab is one centered column of panels. */
+:root{
+  --bg:#F3F4F8; --surface:#FFFFFF; --surface-2:#F8F9FC; --ink:#16182B; --muted:#5E6378; --line:#DDE0EA;
+  --accent:#3B3FD8; --accent-ink:#FFFFFF; --accent-soft:#E8E9FC;
+  --gold:#9A6400; --gold-bg:#FFF1CF;
+  --video:#0E7C86; --video-soft:#DDF3F4;
+  --good:#1D7F4E; --good-soft:#E1F4EA; --bad:#B8362F; --bad-soft:#FBE7E5; --warn:#8A5A00; --warn-soft:#FFF4DB;
+  --off:#ECEDF3;
+  --shadow:0 1px 2px rgba(22,24,43,.05),0 4px 16px rgba(22,24,43,.04);
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Inter","Segoe UI",system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1119; --surface:#181B26; --surface-2:#1D2130; --ink:#ECEEF6; --muted:#9AA0B5; --line:#2A2E40;
+  --accent:#9497FF; --accent-ink:#11131C; --accent-soft:#252948;
+  --gold:#F2C14E; --gold-bg:#382C0F;
+  --video:#5FD0D8; --video-soft:#163236;
+  --good:#4CC98A; --good-soft:#15301F; --bad:#FF7A70; --bad-soft:#3A1F1E; --warn:#F2C14E; --warn-soft:#33290F;
+  --off:#222634; --shadow:none; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1119; --surface:#181B26; --surface-2:#1D2130; --ink:#ECEEF6; --muted:#9AA0B5; --line:#2A2E40;
+  --accent:#9497FF; --accent-ink:#11131C; --accent-soft:#252948;
+  --gold:#F2C14E; --gold-bg:#382C0F;
+  --video:#5FD0D8; --video-soft:#163236;
+  --good:#4CC98A; --good-soft:#15301F; --bad:#FF7A70; --bad-soft:#3A1F1E; --warn:#F2C14E; --warn-soft:#33290F;
+  --off:#222634; --shadow:none; color-scheme:dark }
+
+*{box-sizing:border-box}
+html{scroll-padding-top:120px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:20px;font-weight:800}
+h2{font-size:22px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:12px 16px 0;display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-l{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:32px;height:32px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:15px;flex:none}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{padding:10px 12px;color:var(--muted);text-decoration:none;font-weight:600;font-size:14px;border-bottom:2px solid transparent;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+.badge{font-family:var(--f-num);font-size:11px;background:var(--bad-soft);color:var(--bad);border-radius:999px;padding:0 6px;line-height:18px}
+
+/* controls */
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:500;line-height:1.3}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+button.ghost{border-color:transparent;background:transparent}
+button.ghost:hover{background:var(--surface-2);border-color:var(--line)}
+button.danger{color:var(--bad)}
+button.danger:hover{border-color:var(--bad)}
+button.icon{padding:6px 10px;min-width:36px}
+button.sm{padding:4px 10px;font-size:13px}
+button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number],input[type=text],input[type=date],select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+input[type=number]{width:74px;font-family:var(--f-num);text-align:right}
+input.vid{border-color:var(--video-soft)}
+input:disabled{background:var(--off);border-style:dashed;color:var(--muted)}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent)}
+
+/* layout */
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 72px}
+.view{display:flex;flex-direction:column;gap:24px}
+.view[hidden]{display:none}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nav .label{min-width:160px;text-align:center;font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);min-width:0}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line)}
+.panel-b{padding:18px;display:flex;flex-direction:column;gap:14px}
+.scroll{overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+.grid2e{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-width:0;box-shadow:var(--shadow)}
+.tile.prize{background:var(--gold-bg);border-color:transparent;box-shadow:none}
+.tile.prize .big{color:var(--gold)}
+.tile.warn{background:var(--warn-soft);border-color:transparent;box-shadow:none}
+.tile.warn .big{color:var(--warn)}
+.tile button{align-self:flex-start}
+.big{font-family:var(--f-display);font-size:24px;font-weight:800;line-height:1.2;overflow-wrap:anywhere}
+.progress{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--accent)}
+
+/* banner */
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border-radius:12px;background:var(--accent-soft);color:var(--ink)}
+.banner.off{background:var(--off)}
+.banner.holiday{background:var(--gold-bg)}
+.banner.warn{background:var(--warn-soft)}
+
+/* tables */
+table{border-collapse:collapse;width:100%}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--surface-2)}
+tfoot td{border-top:2px solid var(--line);border-bottom:0;font-weight:600;background:var(--surface-2)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;background:var(--surface-2)}
+thead tr:first-child th:first-child{border-top-left-radius:14px}
+th.grp{text-align:center;border-bottom:0;padding-bottom:0}
+th.img{color:var(--accent)} th.vidh{color:var(--video)}
+th.offcol{color:var(--muted);background:var(--off)}
+td.r,th.r{text-align:right}
+td.c,th.c{text-align:center}
+.rank{font-family:var(--f-num);color:var(--muted);width:36px}
+tr.lead td{background:var(--gold-bg)}
+tr.lead:hover td{background:var(--gold-bg)}
+tr.lead .rank{color:var(--gold);font-weight:700}
+tr.dim td{color:var(--muted)}
+.day{font-family:var(--f-num);font-size:13px;min-width:38px}
+td.offcell{background:var(--off);color:var(--muted)}
+.d-up{color:var(--good);font-weight:700}
+.d-short{color:var(--bad)}
+.d-none{color:var(--muted)}
+.d-miss{color:var(--warn);font-weight:700}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none;letter-spacing:.02em}
+.extra-cell{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.meter{width:80px;height:8px;border-radius:4px;background:var(--accent-soft);overflow:hidden}
+.meter>i{display:block;height:100%;background:var(--accent)}
+.extra-num{font-family:var(--f-num);font-weight:700;min-width:36px;text-align:right}
+.of{color:var(--muted);font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.chip.up{background:var(--good-soft);color:var(--good)}
+.chip.on{background:var(--accent-soft);color:var(--accent)}
+.chip.short{background:var(--bad-soft);color:var(--bad)}
+.chip.none{color:var(--muted);border:1px dashed var(--line)}
+.chip.miss{background:var(--warn-soft);color:var(--warn)}
+.chip.off{background:var(--off);color:var(--muted)}
+.chip.hol{background:var(--gold-bg);color:var(--gold)}
+.chip.vok{background:var(--video-soft);color:var(--video)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.crown{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);padding:12px 18px;border-top:1px solid var(--line)}
+.legend b{font-family:var(--f-num)}
+
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.list .t{font-weight:600;overflow-wrap:anywhere;min-width:0}
+.list li.past{opacity:.6}
+.empty{padding:22px 18px;color:var(--muted)}
+.empty strong{color:var(--ink)}
+
+.report-top{display:flex;flex-wrap:wrap;gap:16px;padding:18px;border-bottom:1px solid var(--line);align-items:center;justify-content:space-between}
+.stats{display:flex;gap:28px;flex-wrap:wrap}
+.stat .v{font-family:var(--f-num);font-size:20px;font-weight:700}
+
+.form{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.flabel{font-size:13px;font-weight:600}
+.hint{font-size:13px;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row .grow{flex:1 1 160px}
+.row .grow input,.row .grow select{width:100%}
+.days{display:flex;gap:8px;flex-wrap:wrap}
+.days label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;font-weight:500}
+.days label:has(input:checked){background:var(--off);border-color:var(--muted)}
+.toggle{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.toggle input{margin-top:3px;flex:none}
+.danger-zone{border-color:var(--bad-soft)}
+.rules{font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:8px;max-width:76ch}
+.rules strong{color:var(--ink)}
+kbd{font-family:var(--f-num);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--surface)}
+
+#toast{position:fixed;left:50%;transform:translate(-50%,8px);bottom:20px;z-index:50;background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:10px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:calc(100% - 32px);display:flex;gap:12px;align-items:center}
+#toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast:not(:has(button)){padding-right:16px}
+#toast button{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 40%,transparent);padding:4px 10px}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+
+.sync{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--off);color:var(--muted);white-space:nowrap}
+.sync.ok{background:var(--good-soft);color:var(--good)}
+.sync.bad{background:var(--bad-soft);color:var(--bad)}
+#gate{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:16px}
+#gate[hidden]{display:none}
+.gate-box{width:100%;max-width:360px;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.gate-box .logo{width:40px;height:40px;font-size:18px}
+.gate-box input{width:100%;font-size:18px;letter-spacing:.2em}
+body.team .admin-only{display:none!important}
+
+@media (max-width:980px){ .tiles{grid-template-columns:1fr 1fr} }
+@media (max-width:820px){ .grid2,.grid2e{grid-template-columns:1fr} }
+@media (max-width:520px){ .tiles{grid-template-columns:1fr} .nav .label{min-width:0} }
+
+@media print{
+  body{background:#fff;color:#000}
+  .top,.noprint,#toast{display:none!important}
+  .view:not(.active){display:none!important}
+  .panel{box-shadow:none;border-color:#ccc}
+  .wrap{padding:0}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="brand-l">
+        <div class="logo" aria-hidden="true">T</div>
+        <div><h1>Template Count Board</h1></div>
+      </div>
+      <div class="nav">
+        <span class="sync" id="syncPill" hidden></span>
+        <button class="ghost sm" id="themeBtn" type="button" aria-label="Change colour theme">Theme: System</button>
+        <button class="ghost sm" id="lockBtn" type="button" hidden>Lock</button>
+      </div>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#log">Daily log <span class="badge" id="missBadge" hidden></span></a>
+      <a href="#report">Weekly report</a>
+      <a href="#designers" class="admin-only">Designers</a>
+      <a href="#holidays" class="admin-only">Holidays &amp; leave</a>
+      <a href="#settings" class="admin-only">Settings</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- OVERVIEW -->
+  <section class="view" data-view="overview">
+    <div class="bar">
+      <div><div class="eyebrow" id="ovWeekEyebrow">This week</div><h2 id="ovWeekTitle">Week</h2></div>
+      <div class="nav">
+        <button class="icon" data-week="-1" aria-label="Previous week">‹</button>
+        <button data-week="0">This week</button>
+        <button class="icon" data-week="1" aria-label="Next week">›</button>
+      </div>
+    </div>
+    <div id="backupNag"></div>
+    <div class="tiles">
+      <div class="tile prize">
+        <div class="eyebrow">This week's prize</div>
+        <div class="big" id="prizeText">No prize set yet</div>
+        <div class="muted" id="prizeSub"></div>
+      </div>
+      <div class="tile">
+        <div class="eyebrow" id="leaderLabel">Leading</div>
+        <div class="big" id="leaderName">Nobody yet</div>
+        <div class="muted" id="leaderSub"></div>
+      </div>
+      <div class="tile">
+        <div class="eyebrow">Working days</div>
+        <div class="big num" id="wdBig">–</div>
+        <div class="progress" aria-hidden="true"><i id="wdBar" style="width:0"></i></div>
+        <div class="muted" id="wdSub"></div>
+      </div>
+      <div class="tile" id="missTile">
+        <div class="eyebrow">Missing entries</div>
+        <div class="big num" id="missBig">0</div>
+        <div class="muted" id="missSub">Every past working day is logged.</div>
+        <button class="sm" id="missGo" hidden>Fill them in</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <h3>Leaderboard</h3>
+        <span class="hint">Ranked by net extra images. Hover a day for details.</span>
+      </div>
+      <div class="scroll" id="board"></div>
+      <div class="legend">
+        <span><b class="d-up">+2</b> above image target</span>
+        <span><b class="d-short">−1</b> below target, deducted</span>
+        <span><b class="d-miss">!</b> not logged</span>
+        <span><b>L</b> on leave</span>
+        <span><b>H</b> holiday</span>
+        <span><b>·</b> weekly off</span>
+      </div>
+    </div>
+
+    <div class="grid2e">
+      <div class="panel">
+        <div class="panel-h"><h3>Past winners</h3></div>
+        <div id="winners"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h3>Most weekly wins</h3></div>
+        <div id="fame"></div>
+      </div>
+    </div>
+
+    <div class="rules">
+      <p><strong>How extras count.</strong> Only images count. On a working day, images above the target add to extras and images below it are taken away. With a target of 18: Monday 19 (+1), Tuesday 20 (+2), Wednesday 16 (−2) gives 1 net extra.</p>
+      <p><strong>Holidays, weekly offs and leave</strong> have no target and nothing is deducted. Images made on those days <span id="ruleHolWork">count fully as extra</span>.</p>
+      <p><strong>Not logged</strong> working days <span id="ruleMissing">are flagged but not deducted</span>. Videos are tracked against their own target and never change extras.</p>
+      <p><strong>Winner.</strong> The highest net extra above 0 wins that week's prize; equal totals share it. The weekly report opens after the last working day of the week (normally on Sunday).</p>
+    </div>
+  </section>
+
+  <!-- DAILY LOG -->
+  <section class="view" data-view="log" hidden>
+    <div class="bar">
+      <div><div class="eyebrow" id="logEyebrow">Today</div><h2 id="logTitle">Daily log</h2></div>
+      <div class="nav">
+        <button class="icon" data-day="-1" aria-label="Previous day">‹</button>
+        <input type="date" id="datePick" aria-label="Day to log">
+        <button class="icon" data-day="1" aria-label="Next day">›</button>
+        <button data-day="0">Today</button>
+      </div>
+    </div>
+    <div id="dayBanner"></div>
+    <div class="panel">
+      <div class="scroll" id="daySheet"></div>
+    </div>
+    <p class="hint noprint">Each box saves when you leave it. Press <kbd>Enter</kbd> to jump to the next designer. Use <kbd>←</kbd> <kbd>→</kbd> to change day and <kbd>T</kbd> for today.</p>
+  </section>
+
+  <!-- REPORT -->
+  <section class="view" data-view="report" hidden>
+    <div class="bar">
+      <div><div class="eyebrow" id="rpEyebrow">Weekly report</div><h2 id="rpTitle">Week</h2></div>
+      <div class="nav noprint">
+        <button class="icon" data-week="-1" aria-label="Previous week">‹</button>
+        <button data-week="0">This week</button>
+        <button class="icon" data-week="1" aria-label="Next week">›</button>
+        <button id="csvBtn">Export CSV</button>
+        <button id="printBtn">Print</button>
+      </div>
+    </div>
+    <div class="panel" id="report"></div>
+  </section>
+
+  <!-- DESIGNERS -->
+  <section class="view" data-view="designers" hidden>
+    <div class="bar"><div><div class="eyebrow">Team</div><h2>Designers</h2></div></div>
+    <div class="panel">
+      <div class="panel-b">
+        <form class="form" id="addForm">
+          <h3>Add a designer</h3>
+          <div class="row">
+            <div class="field grow"><label for="newName">Name</label><input type="text" id="newName" required maxlength="60" placeholder="Designer's name" autocomplete="off"></div>
+            <div class="field"><label for="newImg">Images / day</label><input type="number" id="newImg" min="0" step="1" required></div>
+            <div class="field"><label for="newVid">Videos / day</label><input type="number" id="newVid" min="0" step="1" required class="vid"></div>
+            <button class="primary" type="submit">Add designer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><h3>Team list</h3><span class="hint">Changing a target applies to days not logged yet. Logged days keep their target.</span></div>
+      <div class="scroll" id="designerList"></div>
+    </div>
+  </section>
+
+  <!-- HOLIDAYS -->
+  <section class="view" data-view="holidays" hidden>
+    <div class="bar"><div><div class="eyebrow">Calendar</div><h2>Holidays &amp; leave</h2></div></div>
+
+    <div class="panel">
+      <div class="panel-h"><h3>Weekly off days</h3><span class="hint">No target on these days for anyone</span></div>
+      <div class="panel-b"><div class="days" id="offDays"></div></div>
+    </div>
+
+    <div class="grid2e">
+      <div class="panel">
+        <div class="panel-h"><h3>Company holidays</h3></div>
+        <div class="panel-b">
+          <form class="form" id="holForm">
+            <div class="row">
+              <div class="field grow"><label for="holName">Holiday name</label><input type="text" id="holName" maxlength="60" placeholder="e.g. Diwali" required autocomplete="off"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label for="holFrom">From</label><input type="date" id="holFrom" required></div>
+              <div class="field"><label for="holTo">To <span class="muted">(optional)</span></label><input type="date" id="holTo"></div>
+              <button class="primary" type="submit">Add holiday</button>
+            </div>
+          </form>
+        </div>
+        <div id="holList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><h3>Designer leave</h3></div>
+        <div class="panel-b">
+          <form class="form" id="leaveForm">
+            <div class="row">
+              <div class="field grow"><label for="lvWho">Designer</label><select id="lvWho" required></select></div>
+              <div class="field grow"><label for="lvReason">Reason <span class="muted">(optional)</span></label><input type="text" id="lvReason" maxlength="60" placeholder="e.g. Sick leave" autocomplete="off"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label for="lvFrom">From</label><input type="date" id="lvFrom" required></div>
+              <div class="field"><label for="lvTo">To <span class="muted">(optional)</span></label><input type="date" id="lvTo"></div>
+              <button class="primary" type="submit">Add leave</button>
+            </div>
+          </form>
+        </div>
+        <div id="leaveList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" data-view="settings" hidden>
+    <div class="bar"><div><div class="eyebrow">Setup</div><h2>Settings</h2></div></div>
+    <div class="grid2e">
+      <div class="stack">
+        <div class="panel">
+          <div class="panel-h"><h3>Prize and default targets</h3></div>
+          <div class="panel-b">
+            <form class="form" id="setForm">
+              <div class="field"><label for="prizeIn">Weekly prize</label><input type="text" id="prizeIn" maxlength="120" placeholder="e.g. ₹1,000 voucher"></div>
+              <div class="row">
+                <div class="field"><label for="defImg">Default images / day</label><input type="number" id="defImg" min="0" step="1"></div>
+                <div class="field"><label for="defVid">Default videos / day</label><input type="number" id="defVid" min="0" step="1" class="vid"></div>
+              </div>
+              <div><button class="primary" type="submit">Save</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h3>Counting rules</h3></div>
+          <div class="panel-b">
+            <label class="toggle"><input type="checkbox" id="optHolWork"><span><span class="flabel">Count work on holidays as extra</span><br><span class="hint">Images made on a holiday, weekly off or leave day all count as extra.</span></span></label>
+            <label class="toggle"><input type="checkbox" id="optMissing"><span><span class="flabel">Treat unlogged working days as 0</span><br><span class="hint">A past working day with no images entered deducts the full target.</span></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="panel">
+          <div class="panel-h"><h3>Backup</h3><span class="hint" id="lastBackup"></span></div>
+          <div class="panel-b">
+            <p class="hint" id="backupText">Everything is saved in this browser on this computer. Clearing browser data erases it, so download a backup every week. Load a backup to restore it or to move the board to another computer.</p>
+            <div class="row">
+              <button type="button" class="primary" id="exportBtn">Download backup</button>
+              <button type="button" id="importBtn">Load backup</button>
+              <input type="file" id="importFile" accept=".json,application/json" hidden>
+            </div>
+          </div>
+        </div>
+        <div class="panel danger-zone">
+          <div class="panel-h"><h3>Start over</h3></div>
+          <div class="panel-b">
+            <p class="hint">Deletes every designer, count, holiday and leave entry. Download a backup first.</p>
+            <div><button type="button" class="danger" id="resetBtn">Delete all data</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="gate" hidden>
+  <form class="panel gate-box" id="gateForm">
+    <div class="logo" aria-hidden="true">T</div>
+    <h2>Template Count Board</h2>
+    <p class="muted" id="gateMsg">Loading the team's data…</p>
+    <div class="field" id="pinField" hidden>
+      <label for="pinIn">PIN</label>
+      <input type="password" id="pinIn" inputmode="numeric" autocomplete="current-password" maxlength="64">
+    </div>
+    <button class="primary" type="submit" id="gateBtn" hidden>Open board</button>
+  </form>
+</div>
+
+<script>
+(() => {
+  // ---------- date helpers ----------
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const pad = n => String(n).padStart(2, "0");
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const isYmd = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+  const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate()+n); return ymd(d); };
+  const dow = s => (parse(s).getDay() + 6) % 7; // 0 = Monday
+  const weekStart = s => addDays(s, -dow(s));
+  const isoWeek = s => { const d = parse(s); d.setDate(d.getDate() + 3 - (d.getDay()+6)%7);
+    const w1 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round(((d - w1)/864e5 - 3 + (w1.getDay()+6)%7) / 7); };
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const DOW = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const DOWL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const fmt = s => { const d = parse(s); return `${d.getDate()} ${MON[d.getMonth()]}`; };
+  const fmtY = s => `${fmt(s)} ${parse(s).getFullYear()}`;
+  const fmtLong = s => `${DOWL[dow(s)]}, ${fmtY(s)}`;
+  const range = (a, b) => a === b ? fmtY(a) : `${fmt(a)} – ${fmtY(b)}`;
+  const fin = v => typeof v === "number" && Number.isFinite(v);
+  const plural = (n, w) => `${n} ${w}${Math.abs(n) === 1 ? "" : "s"}`;
+  const signed = n => n > 0 ? "+" + n : n < 0 ? "−" + (-n) : "0";
+  const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+
+  let today = ymd(new Date());
+  const STORE_KEY = "templateCountBoard.v1";
+  const PREFS_KEY = "templateCountBoard.prefs";
+  const PIN_KEY = "templateCountBoard.pin";
+  // Online (Vercel) when served over http(s); offline file mode keeps data in this browser.
+  const API = location.protocol.startsWith("http") ? "/api/data" : null;
+  const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+  const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); return true; } catch { return false; } };
+
+  // ---------- state ----------
+  const DEFAULTS = { prize: "", defImg: 10, defVid: 0, offDays: [6], holidayWorkCounts: true, missingAsZero: false };
+  let settings = { ...DEFAULTS };
+  let prefs = { theme: "system", lastBackup: null }; // per-person, never shared
+  try { const p = JSON.parse(lsGet(PREFS_KEY) || "{}"); if (["light", "dark", "system"].includes(p.theme)) prefs.theme = p.theme; if (isYmd(p.lastBackup)) prefs.lastBackup = p.lastBackup; } catch {}
+  const savePrefs = () => lsSet(PREFS_KEY, JSON.stringify(prefs));
+  let role = "admin", openAccess = false;
+  const designers = new Map(); // id -> {name,imageTarget,videoTarget,active,createdAt}
+  const logs = new Map();      // "<designerId>_<date>" -> {designerId,date,images,videos,imageTarget,videoTarget}
+  const holidays = new Map();  // date -> {name}
+  const leaves = new Map();    // id -> {designerId,from,to,reason}
+  let selDate = today;
+
+  function loadState(obj) {
+    designers.clear(); logs.clear(); holidays.clear(); leaves.clear();
+    const s = obj?.settings || {};
+    settings = { ...DEFAULTS,
+      prize: typeof s.prize === "string" ? s.prize : "",
+      defImg: fin(s.defImg) ? s.defImg : DEFAULTS.defImg,
+      defVid: fin(s.defVid) ? s.defVid : DEFAULTS.defVid,
+      offDays: Array.isArray(s.offDays) ? [...new Set(s.offDays.filter(n => Number.isInteger(n) && n >= 0 && n <= 6))] : [6],
+      holidayWorkCounts: s.holidayWorkCounts !== false,
+      missingAsZero: s.missingAsZero === true };
+    for (const [id, d] of Object.entries(obj?.designers || {})) if (d && typeof d.name === "string") designers.set(id, d);
+    for (const [id, l] of Object.entries(obj?.logs || {})) if (l && isYmd(l.date) && typeof l.designerId === "string") logs.set(id, l);
+    for (const [date, h] of Object.entries(obj?.holidays || {})) if (isYmd(date)) holidays.set(date, { name: String(h?.name || "Holiday").slice(0, 60) });
+    for (const [id, l] of Object.entries(obj?.leaves || {})) if (l && typeof l.designerId === "string" && isYmd(l.from) && isYmd(l.to)) leaves.set(id, { designerId: l.designerId, from: l.from, to: l.to, reason: String(l.reason || "") });
+  }
+  const snapshot = () => ({ app: "template-count-board", version: 2, savedAt: new Date().toISOString(), settings,
+    designers: Object.fromEntries(designers), logs: Object.fromEntries(logs),
+    holidays: Object.fromEntries(holidays), leaves: Object.fromEntries(leaves) });
+  const clone = () => JSON.parse(JSON.stringify(snapshot()));
+  function persist() {
+    if (API) { scheduleSync(); return true; }
+    if (lsSet(STORE_KEY, JSON.stringify(snapshot()))) return true;
+    toast("This browser blocked saving. Download a backup so nothing is lost."); return false;
+  }
+  // Save, re-render, confirm. Pass the state from before the change to offer Undo.
+  function commit(msg = "Saved", undoFrom = null) {
+    const ok = persist();
+    resetKeys(); render();
+    if (ok) toast(msg, undoFrom ? { label: "Undo", fn: () => { loadState(undoFrom); persist(); resetKeys(); render(); toast("Undone"); } } : null);
+  }
+  if (!API) { try { const raw = lsGet(STORE_KEY); if (raw) loadState(JSON.parse(raw)); } catch {} }
+
+  // ---------- online sync (Vercel + Upstash Redis) ----------
+  // The page keeps the whole board in memory. After each change it sends only what
+  // differs from the last state the server confirmed, and it pulls fresh data every 20 s.
+  const COLLS = ["designers", "logs", "holidays", "leaves"];
+  let synced = null, syncing = false, syncTimer = null, failCount = 0;
+  let pin = lsGet(PIN_KEY) || "";
+  const serial = () => {
+    const m = map => { const o = {}; for (const [k, v] of map) o[k] = JSON.stringify(v); return o; };
+    return { settings: JSON.stringify(settings), designers: m(designers), logs: m(logs), holidays: m(holidays), leaves: m(leaves) };
+  };
+  function diff() {
+    const cur = serial(), ops = [];
+    if (!synced) return { cur, ops };
+    if (cur.settings !== synced.settings) ops.push({ op: "set", coll: "settings", value: JSON.parse(cur.settings) });
+    for (const c of COLLS) {
+      const a = synced[c], b = cur[c];
+      for (const id in b) if (a[id] !== b[id]) ops.push({ op: "set", coll: c, id, value: JSON.parse(b[id]) });
+      for (const id in a) if (!(id in b)) ops.push({ op: "del", coll: c, id });
+    }
+    return { cur, ops };
+  }
+  function chunks(ops) {
+    const out = []; let cur = [], size = 0;
+    for (const o of ops) { const s = JSON.stringify(o).length;
+      if (cur.length && (cur.length >= 400 || size + s > 400000)) { out.push(cur); cur = []; size = 0; }
+      cur.push(o); size += s; }
+    if (cur.length) out.push(cur);
+    return out;
+  }
+  async function api(method, body, keepalive = false) {
+    const r = await fetch(API, { method, cache: "no-store", keepalive,
+      headers: { "Content-Type": "application/json", "x-team-pin": pin },
+      body: body ? JSON.stringify(body) : undefined });
+    if (!r.ok) { const e = new Error("api"); e.status = r.status; try { e.data = await r.json(); } catch {} throw e; }
+    return r.json();
+  }
+  function setSync(state, msg) {
+    const p = $("#syncPill"); if (!API) return;
+    p.hidden = false;
+    p.className = "sync" + (state === "saved" ? " ok" : state === "error" ? " bad" : "");
+    p.textContent = msg || { saving: "Saving…", saved: "All changes saved", error: "Not saved, retrying" }[state];
+  }
+  function scheduleSync(delay = 300) {
+    if (!API) return;
+    clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, delay); setSync("saving");
+  }
+  async function syncNow() {
+    if (syncing) { scheduleSync(500); return; }
+    const { cur, ops } = diff();
+    if (!ops.length) { setSync("saved"); return; }
+    syncing = true;
+    try {
+      for (const c of chunks(ops)) await api("POST", { ops: c });
+      synced = cur; failCount = 0; setSync("saved");
+    } catch (e) {
+      if (e.status === 401) { syncing = false; showGate("Your PIN has changed. Enter the new PIN to keep saving."); return; }
+      if (e.status === 403 || e.status === 400) {
+        toast(e.data?.message || "That change wasn't allowed."); syncing = false; await pull(true); return;
+      }
+      failCount++; setSync("error", navigator.onLine === false ? "Offline, will save when back" : "Not saved, retrying");
+      clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, Math.min(30000, 2000 * 2 ** failCount));
+    } finally { syncing = false; }
+    if (diff().ops.length) scheduleSync(300);
+  }
+  function applyServer(data) {
+    role = data.role === "team" ? "team" : "admin"; openAccess = !!data.open;
+    loadState({ settings: data.settings || {}, designers: data.designers, logs: data.logs, holidays: data.holidays, leaves: data.leaves });
+    synced = serial();
+    document.body.classList.toggle("team", role === "team");
+    $("#lockBtn").hidden = !pin;
+  }
+  async function pull(force) {
+    if (!API) return;
+    if (!force && (syncing || !synced || diff().ops.length)) return;
+    const data = await api("GET");
+    if (!force && (syncing || diff().ops.length)) return; // a change happened while loading
+    today = ymd(new Date());
+    applyServer(data); resetKeys(); render();
+  }
+  function showGate(msg, askPin = true) {
+    $("#gate").hidden = false; $("#gateMsg").textContent = msg;
+    $("#pinField").hidden = !askPin; $("#gateBtn").hidden = !askPin;
+    if (askPin) setTimeout(() => $("#pinIn").focus(), 0);
+  }
+  async function boot() {
+    showGate("Loading the team's data…", false);
+    try {
+      applyServer(await api("GET"));
+      $("#gate").hidden = true; setSync("saved"); route();
+    } catch (e) {
+      if (e.status === 401) showGate(pin ? "That PIN didn't work. Ask the manager for the current PIN." : "Enter the PIN the manager gave you.");
+      else if (e.data?.error === "not_configured") showGate(e.data.message, false);
+      else showGate("Couldn't load the board. Check your internet connection and reload the page.", false);
+    }
+  }
+  $("#gateForm").addEventListener("submit", e => {
+    e.preventDefault(); pin = $("#pinIn").value.trim(); lsSet(PIN_KEY, pin || null); $("#pinIn").value = ""; boot();
+  });
+  $("#lockBtn").onclick = () => { pin = ""; lsSet(PIN_KEY, null); location.reload(); };
+  if (API) {
+    setInterval(() => { if (document.visibilityState === "visible") pull(false).catch(() => {}); }, 20000);
+    window.addEventListener("focus", () => pull(false).catch(() => {}));
+    window.addEventListener("online", () => scheduleSync(0));
+    window.addEventListener("pagehide", () => { const { ops } = diff(); if (ops.length && ops.length <= 100) api("POST", { ops }, true).catch(() => {}); });
+    window.addEventListener("beforeunload", e => { if (syncing || diff().ops.length) { e.preventDefault(); e.returnValue = ""; } });
+  }
+
+  // ---------- toast ----------
+  let toastT;
+  function toast(msg, action) {
+    const t = $("#toast"); t.replaceChildren();
+    const span = document.createElement("span"); span.textContent = msg; t.append(span);
+    if (action) { const b = document.createElement("button"); b.type = "button"; b.textContent = action.label;
+      b.onclick = () => { t.classList.remove("show"); action.fn(); }; t.append(b); }
+    t.classList.add("show"); clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove("show"), action ? 6000 : 2200);
+  }
+
+  // ---------- rules ----------
+  const logId = (did, date) => `${did}_${date}`;
+  const newId = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const dImg = did => { const d = designers.get(did); return fin(d?.imageTarget) ? d.imageTarget : settings.defImg; };
+  const dVid = did => { const d = designers.get(did); return fin(d?.videoTarget) ? d.videoTarget : settings.defVid; };
+  const leaveFor = (did, date) => { for (const l of leaves.values()) if (l.designerId === did && l.from <= date && date <= l.to) return l; return null; };
+  function dayType(date, did) {
+    const h = holidays.get(date); if (h) return { type: "holiday", label: h.name || "Holiday" };
+    if (settings.offDays.includes(dow(date))) return { type: "off", label: `Weekly off` };
+    if (did) { const l = leaveFor(did, date); if (l) return { type: "leave", label: l.reason || "On leave" }; }
+    return { type: "work" };
+  }
+  function dayInfo(did, date) {
+    const t = dayType(date, did), work = t.type === "work";
+    const l = logs.get(logId(did, date)) || {};
+    const imgT = work ? (fin(l.imageTarget) ? l.imageTarget : dImg(did)) : 0;
+    const vidT = work ? (fin(l.videoTarget) ? l.videoTarget : dVid(did)) : 0;
+    const rawImg = fin(l.images) ? l.images : null;
+    const vid = fin(l.videos) ? l.videos : null;
+    const d = designers.get(did);
+    const joined = d && fin(d.createdAt) ? ymd(new Date(d.createdAt)) : "";
+    const missing = work && rawImg === null && date < today && !!d && date >= joined;
+    const img = rawImg !== null ? rawImg : (missing && settings.missingAsZero ? 0 : null);
+    let imgDiff = img === null ? null : img - imgT;
+    if (!work && imgDiff !== null && !settings.holidayWorkCounts) imgDiff = 0;
+    return { t, work, imgT, vidT, img, rawImg, vid, missing, imgDiff, vidDiff: vid === null ? null : vid - vidT };
+  }
+  const sortedDesigners = all => [...designers.entries()]
+    .filter(([, d]) => all || d.active !== false)
+    .sort((a, b) => (a[1].createdAt || 0) - (b[1].createdAt || 0) || String(a[1].name).localeCompare(b[1].name));
+  const weekDays = ws => [...Array(7)].map((_, i) => addDays(ws, i));
+  const workDaysOf = ws => weekDays(ws).filter(d => dayType(d).type === "work");
+  const lastWorkDay = ws => { const w = workDaysOf(ws); return w.length ? w[w.length - 1] : addDays(ws, 6); };
+  const weekFinal = ws => today > lastWorkDay(ws) || today >= addDays(ws, 6);
+
+  function weekStats(ws) {
+    const days = weekDays(ws);
+    const ids = new Set(sortedDesigners(false).map(([id]) => id));
+    for (const l of logs.values()) if (l.date >= days[0] && l.date <= days[6] && designers.has(l.designerId)) ids.add(l.designerId);
+    const rows = [...ids].map(id => {
+      const r = { id, name: designers.get(id)?.name || "Removed designer", plus: 0, minus: 0, img: 0, imgT: 0, vid: 0, vidT: 0,
+        imgDays: 0, hitDays: 0, shortDays: 0, vidDays: 0, best: 0, missDays: 0, leaveDays: 0, holWork: 0 };
+      r.cells = days.map(date => {
+        const inf = dayInfo(id, date);
+        if (inf.t.type === "leave") r.leaveDays++;
+        if (inf.missing) r.missDays++;
+        if (inf.img !== null) {
+          r.imgDays++; r.img += inf.img; r.imgT += inf.imgT;
+          if (!inf.work) r.holWork += inf.img;
+          if (inf.imgDiff > 0) { r.plus += inf.imgDiff; r.best = Math.max(r.best, inf.imgDiff); }
+          if (inf.imgDiff < 0) { r.minus -= inf.imgDiff; r.shortDays++; } else if (inf.work) r.hitDays++;
+        }
+        if (inf.vid !== null) { r.vidDays++; r.vid += inf.vid; r.vidT += inf.vidT; }
+        return inf;
+      });
+      r.extra = r.plus - r.minus;
+      r.logged = r.imgDays + r.vidDays > 0;
+      return r;
+    });
+    rows.sort((a, b) => b.extra - a.extra || b.img - a.img || a.name.localeCompare(b.name));
+    const top = rows.length && rows[0].extra > 0 ? rows[0].extra : 0;
+    const leaders = top > 0 ? rows.filter(r => r.extra === top) : [];
+    return { days, rows, top, leaders };
+  }
+  function earliestDate() { let e = today; for (const l of logs.values()) if (l.date < e) e = l.date; return e; }
+  function finishedWeeks() {
+    const out = [];
+    for (let ws = weekStart(today); ws >= weekStart(earliestDate()); ws = addDays(ws, -7)) {
+      if (!weekFinal(ws)) continue;
+      const st = weekStats(ws);
+      if (st.rows.some(r => r.logged)) out.push({ ws, st });
+    }
+    return out;
+  }
+  function missingInWeek(ws) {
+    const out = [];
+    for (const date of weekDays(ws)) for (const [id] of sortedDesigners(false)) if (dayInfo(id, date).missing) out.push({ id, date });
+    return out;
+  }
+
+  // ---------- avatars ----------
+  function hue(s) { let h = 7; for (const c of String(s)) h = (h * 31 + c.codePointAt(0)) >>> 0; return Math.round((h * 137.508) % 360); }
+  const initials = n => String(n).trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("").toUpperCase() || "?";
+  const av = (id, name) => `<span class="av" style="background:hsl(${hue(id)} 52% 44%)" aria-hidden="true">${esc(initials(name))}</span>`;
+  const who = (id, name, extra = "") => `<div class="who">${av(id, name)}<strong>${esc(name)}</strong>${extra}</div>`;
+
+  // ---------- views / routing ----------
+  const VIEWS = ["overview", "log", "report", "designers", "holidays", "settings"];
+  let view = "overview";
+  function route() {
+    const h = location.hash.slice(1);
+    view = VIEWS.includes(h) ? h : "overview";
+    if (role === "team" && ["designers", "holidays", "settings"].includes(view)) view = "overview";
+    $$(".view").forEach(v => { const on = v.dataset.view === view; v.hidden = !on; v.classList.toggle("active", on); });
+    $$(".tabs a").forEach(a => { if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    render();
+  }
+  window.addEventListener("hashchange", route);
+
+  let dayKey = "", listKey = "";
+  const resetKeys = () => { dayKey = ""; listKey = ""; };
+
+  function render() {
+    applyTheme();
+    const miss = missingInWeek(weekStart(today)).length + (weekStart(today) !== weekStart(addDays(today, -7)) ? missingInWeek(weekStart(addDays(today, -7))).length : 0);
+    const b = $("#missBadge"); b.hidden = !miss; b.textContent = miss;
+    if (view === "overview") renderOverview();
+    else if (view === "log") renderLog();
+    else if (view === "report") renderReport();
+    else if (view === "designers") renderDesigners();
+    else if (view === "holidays") renderHolidays();
+    else if (view === "settings") renderSettings();
+  }
+
+  // ---------- overview ----------
+  function renderOverview() {
+    const ws = weekStart(selDate), we = addDays(ws, 6), current = ws === weekStart(today), final = weekFinal(ws);
+    $("#ovWeekEyebrow").textContent = current ? "This week" : ws < weekStart(today) ? "Past week" : "Upcoming week";
+    $("#ovWeekTitle").textContent = `Week ${isoWeek(ws)} · ${range(ws, we)}`;
+
+    const hasData = designers.size > 0;
+    const daysSince = prefs.lastBackup ? daysBetween(prefs.lastBackup, today) : null;
+    $("#backupNag").innerHTML = API
+      ? (openAccess ? `<div class="banner warn noprint"><span><strong>Anyone with this link can change the data.</strong> Add ADMIN_PIN and TEAM_PIN in Vercel → Settings → Environment Variables, then redeploy.</span></div>` : "")
+      : hasData && (daysSince === null || daysSince >= 7)
+      ? `<div class="banner warn noprint"><span>${daysSince === null ? "You haven't downloaded a backup yet." : `Last backup was ${plural(daysSince, "day")} ago.`} Counts are stored only in this browser.</span><button class="sm" data-act="backup">Download backup</button></div>` : "";
+
+    $("#prizeText").textContent = settings.prize || "No prize set yet";
+    $("#prizeSub").innerHTML = settings.prize ? "For the most net extra images this week." : `<a href="#settings">Set the prize in Settings</a>`;
+
+    const st = weekStats(ws);
+    $("#leaderLabel").textContent = final ? "Winner" : "Leading";
+    if (st.leaders.length) {
+      $("#leaderName").textContent = st.leaders.map(r => r.name).join(" & ");
+      $("#leaderSub").textContent = `${plural(st.top, "net extra image")}${st.leaders.length > 1 ? " each, tied" : ""}`;
+    } else { $("#leaderName").textContent = "Nobody yet"; $("#leaderSub").textContent = "Nobody is above their image target yet."; }
+
+    const wd = workDaysOf(ws), done = wd.filter(d => d < today || (d === today)).length;
+    $("#wdBig").textContent = current ? `${done} / ${wd.length}` : `${wd.length}`;
+    $("#wdBar").style.width = `${wd.length ? (current ? done / wd.length : ws < weekStart(today) ? 1 : 0) * 100 : 0}%`;
+    const hols = weekDays(ws).filter(d => holidays.has(d));
+    $("#wdSub").textContent = (current ? `${plural(wd.length - done, "working day")} left after today` : `working days`) + (hols.length ? ` · ${plural(hols.length, "holiday")}` : "");
+
+    const miss = missingInWeek(ws);
+    $("#missTile").classList.toggle("warn", miss.length > 0);
+    $("#missBig").textContent = miss.length;
+    $("#missSub").textContent = miss.length ? `${[...new Set(miss.map(m => m.date))].map(fmt).join(", ")} ${settings.missingAsZero ? "count as 0 images" : "aren't counted until filled"}` : "Every past working day is logged.";
+    $("#missGo").hidden = !miss.length;
+    $("#missGo").onclick = () => { selDate = miss[0].date; location.hash = "log"; };
+
+    $("#ruleHolWork").textContent = settings.holidayWorkCounts ? "count fully as extra" : "are recorded but don't change extras";
+    $("#ruleMissing").textContent = settings.missingAsZero ? "count as 0 images, so the full target is deducted" : "are flagged but not deducted";
+
+    renderBoard(st, ws, final);
+    renderWinners();
+  }
+
+  function dayCell(inf) {
+    const t = inf.t;
+    const title = [t.type !== "work" ? t.label : null,
+      inf.img !== null ? `${inf.img} images${inf.work ? ` (target ${inf.imgT})` : ""}` : null,
+      inf.vid !== null ? `${inf.vid} videos${inf.work ? ` (target ${inf.vidT})` : ""}` : null,
+      inf.missing ? "Not logged" : null].filter(Boolean).join(" · ") || "Not logged yet";
+    const offCls = t.type !== "work" ? " offcell" : "";
+    if (inf.img !== null) {
+      const cls = inf.imgDiff > 0 ? "d-up" : inf.imgDiff < 0 ? "d-short" : "";
+      return `<td class="c day ${cls}${offCls}" title="${esc(title)}">${inf.missing ? "!" + signed(inf.imgDiff) : signed(inf.imgDiff)}</td>`;
+    }
+    if (inf.missing) return `<td class="c day d-miss" title="${esc(title)}">!</td>`;
+    const mark = t.type === "leave" ? "L" : t.type === "holiday" ? "H" : t.type === "off" ? "·" : "";
+    return `<td class="c day d-none${offCls}" title="${esc(title)}">${mark || "–"}</td>`;
+  }
+  const ofCell = (n, t, has) => has ? `<td class="r num">${n} <span class="of">/ ${t}</span></td>` : `<td class="r num of">–</td>`;
+
+  function renderBoard(st, ws, final) {
+    const { days, rows, top } = st;
+    if (!rows.length) {
+      $("#board").innerHTML = `<div class="empty"><strong>No designers yet.</strong> <a href="#designers">Add your designers</a> with their daily image and video targets. Each one gets a row here showing how far above or below target they were each day.</div>`;
+      return;
+    }
+    const max = Math.max(1, ...rows.map(r => r.extra));
+    const head = `<tr><th>#</th><th>Designer</th>${days.map((d, i) => { const t = dayType(d);
+      return `<th class="c${t.type !== "work" ? " offcol" : ""}" title="${esc(fmtLong(d) + (t.type !== "work" ? " · " + t.label : ""))}">${DOW[i]}<br><span class="of">${parse(d).getDate()}</span></th>`; }).join("")}
+      <th class="r img">Images</th><th class="r vidh">Videos</th><th class="r">Net extra</th></tr>`;
+    const body = rows.map((r, i) => {
+      const lead = top > 0 && r.extra === top;
+      return `<tr class="${lead ? "lead" : ""}">
+        <td class="rank">${i + 1}</td>
+        <td>${who(r.id, r.name, lead ? `<span class="crown">${final ? "Winner" : "Leading"}</span>` : "")}</td>
+        ${r.cells.map(dayCell).join("")}
+        ${ofCell(r.img, r.imgT, r.imgDays)}
+        ${ofCell(r.vid, r.vidT, r.vidDays)}
+        <td><div class="extra-cell"><span class="meter"><i style="width:${(Math.max(0, r.extra) / max) * 100}%"></i></span><span class="extra-num ${r.extra < 0 ? "d-short" : ""}">${signed(r.extra)}</span></div></td>
+      </tr>`;
+    }).join("");
+    $("#board").innerHTML = `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  }
+
+  function renderWinners() {
+    const weeks = finishedWeeks();
+    $("#winners").innerHTML = weeks.length ? `<ul class="list">${weeks.slice(0, 8).map(({ ws, st }) => `<li>
+      <div style="min-width:0"><div class="eyebrow">Week ${isoWeek(ws)} · ${fmt(ws)} – ${fmt(addDays(ws, 6))}</div>
+      <div class="t">${st.leaders.length ? esc(st.leaders.map(r => r.name).join(" & ")) : '<span class="muted">No winner</span>'}</div></div>
+      <div class="num" style="font-weight:700">${st.top ? "+" + st.top : ""}</div></li>`).join("")}</ul>`
+      : `<div class="empty">Each finished week's winner is listed here.</div>`;
+    const tally = new Map();
+    for (const { st } of weeks) for (const r of st.leaders) tally.set(r.id, (tally.get(r.id) || 0) + 1);
+    const fame = [...tally.entries()].filter(([id]) => designers.has(id)).sort((a, b) => b[1] - a[1]);
+    $("#fame").innerHTML = fame.length ? `<ul class="list">${fame.slice(0, 8).map(([id, n]) => `<li>${who(id, designers.get(id).name)}<span class="num" style="font-weight:700">${plural(n, "win")}</span></li>`).join("")}</ul>`
+      : `<div class="empty">Win counts build up here as weeks finish.</div>`;
+  }
+
+  // ---------- daily log ----------
+  function renderLog() {
+    $("#datePick").value = selDate;
+    $("#logEyebrow").textContent = selDate === today ? "Today" : selDate < today ? `${plural(daysBetween(selDate, today), "day")} ago` : "Upcoming";
+    $("#logTitle").textContent = fmtLong(selDate);
+    const t = dayType(selDate);
+    const list = sortedDesigners(false);
+    const onLeave = list.filter(([id]) => dayType(selDate, id).type === "leave").length;
+    $("#dayBanner").innerHTML = t.type === "holiday"
+      ? `<div class="banner holiday"><span><strong>Holiday: ${esc(t.label)}.</strong> No targets today. ${settings.holidayWorkCounts ? "Any images made count fully as extra." : "Counts are recorded but don't change extras."}</span></div>`
+      : t.type === "off" ? `<div class="banner off"><span><strong>Weekly off (${DOWL[dow(selDate)]}).</strong> No targets today. ${settings.holidayWorkCounts ? "Any images made count fully as extra." : ""}</span></div>`
+      : selDate > today ? `<div class="banner"><span>This day hasn't happened yet. You can still mark leave in advance.</span></div>`
+      : onLeave ? `<div class="banner"><span>${plural(onLeave, "designer")} on leave today.</span></div>` : "";
+
+    const admin = role === "admin";
+    const key = [selDate, role, settings.offDays.join(), holidays.has(selDate), ...list.map(([id]) => id + dayType(selDate, id).type)].join("|");
+    if (key !== dayKey) {
+      dayKey = key;
+      if (!list.length) {
+        $("#daySheet").innerHTML = `<div class="empty"><strong>Nothing to log yet.</strong> <a href="#designers">Add designers</a> first. Each day then shows a row per designer with boxes for images and videos.</div>`;
+        return;
+      }
+      $("#daySheet").innerHTML = `<table><thead>
+        <tr><th></th><th class="grp img" colspan="2">Images</th><th class="grp vidh" colspan="2">Videos</th><th></th><th></th></tr>
+        <tr><th>Designer</th><th class="r">Target</th><th class="r">Made</th><th class="r">Target</th><th class="r">Made</th><th>Result</th><th class="noprint"></th></tr></thead><tbody>${
+        list.map(([id, d]) => { const dt = dayType(selDate, id), work = dt.type === "work";
+          return `<tr data-id="${esc(id)}" class="${work ? "" : "dim"}">
+          <td>${who(id, d.name)}</td>
+          <td class="r"><input type="number" min="0" step="1" id="it-${esc(id)}" data-kind="it" aria-label="Image target for ${esc(d.name)}" ${work && admin ? "" : "disabled"}></td>
+          <td class="r"><input type="number" min="0" step="1" id="im-${esc(id)}" data-kind="im" aria-label="Images made by ${esc(d.name)}" placeholder="–"></td>
+          <td class="r"><input type="number" min="0" step="1" id="vt-${esc(id)}" data-kind="vt" class="vid" aria-label="Video target for ${esc(d.name)}" ${work && admin ? "" : "disabled"}></td>
+          <td class="r"><input type="number" min="0" step="1" id="vm-${esc(id)}" data-kind="vm" class="vid" aria-label="Videos made by ${esc(d.name)}" placeholder="–"></td>
+          <td><div class="chips" id="res-${esc(id)}"></div></td>
+          <td class="r noprint">${admin && (dt.type === "leave" || work) ? `<button type="button" class="sm ghost" data-act="leave">${dt.type === "leave" ? "Remove leave" : "Mark leave"}</button>` : ""}</td></tr>`; }).join("")
+      }</tbody><tfoot><tr><td>Day total</td><td class="r num" id="tot-it"></td><td class="r num" id="tot-im"></td><td class="r num" id="tot-vt"></td><td class="r num" id="tot-vm"></td><td id="tot-x"></td><td class="noprint"></td></tr></tfoot></table>`;
+    }
+    const setVal = (el, v) => { if (el && document.activeElement !== el) el.value = v; };
+    let tIt = 0, tIm = 0, tVt = 0, tVm = 0, tX = 0;
+    for (const [id] of list) {
+      const inf = dayInfo(id, selDate);
+      setVal(document.getElementById("im-" + id), inf.rawImg ?? "");
+      setVal(document.getElementById("vm-" + id), inf.vid ?? "");
+      setVal(document.getElementById("it-" + id), inf.work ? inf.imgT : "");
+      setVal(document.getElementById("vt-" + id), inf.work ? inf.vidT : "");
+      const im = document.getElementById("im-" + id); if (im) im.placeholder = inf.work ? "–" : "0";
+      tIt += inf.imgT; tVt += inf.vidT; tIm += inf.rawImg || 0; tVm += inf.vid || 0; if (inf.imgDiff !== null && inf.rawImg !== null) tX += inf.imgDiff;
+      const res = document.getElementById("res-" + id); if (!res) continue;
+      let h = "";
+      if (inf.t.type === "leave") h += `<span class="chip off">Leave${inf.t.label !== "On leave" ? ": " + esc(inf.t.label) : ""}</span>`;
+      else if (inf.t.type === "holiday") h += `<span class="chip hol">${esc(inf.t.label)}</span>`;
+      else if (inf.t.type === "off") h += `<span class="chip off">Weekly off</span>`;
+      if (inf.rawImg !== null) {
+        h += inf.imgDiff > 0 ? `<span class="chip up">+${inf.imgDiff} extra</span>`
+          : inf.imgDiff < 0 ? `<span class="chip short">${-inf.imgDiff} short · −${-inf.imgDiff} extras</span>`
+          : inf.work ? `<span class="chip on">On target</span>` : "";
+      } else if (inf.missing) h += `<span class="chip miss">Not logged${settings.missingAsZero ? ` · −${inf.imgT} extras` : ""}</span>`;
+      else if (inf.work && selDate <= today) h += `<span class="chip none">Waiting for count</span>`;
+      if (inf.vid !== null && inf.work) h += `<span class="chip ${inf.vidDiff >= 0 ? "vok" : "none"}">Videos ${inf.vid}/${inf.vidT}</span>`;
+      res.innerHTML = h;
+    }
+    const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    s("tot-it", tIt); s("tot-im", tIm); s("tot-vt", tVt); s("tot-vm", tVm);
+    const tx = document.getElementById("tot-x"); if (tx) tx.innerHTML = `<span class="chip ${tX > 0 ? "up" : tX < 0 ? "short" : "on"}">${signed(tX)} net extras today</span>`;
+  }
+
+  $("#daySheet").addEventListener("change", e => {
+    const el = e.target, kind = el.dataset.kind; if (!kind) return;
+    const id = el.closest("tr").dataset.id;
+    const n = toInt(el.value);
+    if (Number.isNaN(n)) { toast("Enter a whole number, 0 or more."); dayKey = ""; renderLog(); return; }
+    const inf = dayInfo(id, selDate);
+    let img = inf.rawImg, vid = inf.vid;
+    const l = logs.get(logId(id, selDate)) || {};
+    let imgT = fin(l.imageTarget) ? l.imageTarget : dImg(id), vidT = fin(l.videoTarget) ? l.videoTarget : dVid(id);
+    if (kind === "im") img = n;
+    else if (kind === "vm") vid = n;
+    else { if (n === null) { renderLog(); return; } if (kind === "it") imgT = n; else vidT = n; }
+    const lid = logId(id, selDate);
+    if (img === null && vid === null && imgT === dImg(id) && vidT === dVid(id)) logs.delete(lid);
+    else logs.set(lid, { designerId: id, date: selDate, images: img, videos: vid, imageTarget: imgT, videoTarget: vidT });
+    if (persist() && !API) toast("Saved");
+    render();
+  });
+  $("#daySheet").addEventListener("keydown", e => {
+    if (e.key !== "Enter" || !e.target.dataset.kind) return;
+    e.preventDefault();
+    const all = $$(`#daySheet input[data-kind="${e.target.dataset.kind}"]:not(:disabled)`);
+    const next = all[all.indexOf(e.target) + (e.shiftKey ? -1 : 1)];
+    if (next) { next.focus(); next.select(); } else e.target.blur();
+  });
+  $("#daySheet").addEventListener("click", e => {
+    if (e.target.dataset.act !== "leave") return;
+    const id = e.target.closest("tr").dataset.id, before = clone();
+    const l = leaveFor(id, selDate);
+    if (l) {
+      const lid = [...leaves.entries()].find(([, v]) => v === l)[0];
+      leaves.delete(lid);
+      if (l.from < selDate) leaves.set(newId("l"), { ...l, to: addDays(selDate, -1) });
+      if (l.to > selDate) leaves.set(newId("l"), { ...l, from: addDays(selDate, 1) });
+      commit("Leave removed for this day", before);
+    } else {
+      leaves.set(newId("l"), { designerId: id, from: selDate, to: selDate, reason: "" });
+      commit(`${designers.get(id)?.name || "Designer"} marked on leave`, before);
+    }
+  });
+
+  // ---------- report ----------
+  let previewWeek = null;
+  function reportData(ws) {
+    const st = weekStats(ws);
+    return { ...st, used: st.rows.filter(r => r.logged || r.missDays) };
+  }
+  function renderReport() {
+    const ws = weekStart(selDate), we = addDays(ws, 6), final = weekFinal(ws);
+    $("#rpEyebrow").textContent = final ? "Weekly report · final" : "Weekly report · in progress";
+    $("#rpTitle").textContent = `Week ${isoWeek(ws)} · ${range(ws, we)}`;
+    if (!final && previewWeek !== ws) {
+      $("#report").innerHTML = `<div class="empty"><strong>Opens after ${fmtLong(lastWorkDay(ws))}.</strong> The full report (images, videos, extras earned, deductions and the winner) appears once the week's last working day is over. The <a href="#overview">leaderboard</a> stays live until then.<div style="margin-top:12px"><button class="sm" data-act="preview">Preview the report so far</button></div></div>`;
+      return;
+    }
+    const { leaders, top, used } = reportData(ws);
+    if (!used.length) { $("#report").innerHTML = `<div class="empty">No counts were logged for ${range(ws, we)}.</div>`; return; }
+    const sum = k => used.reduce((a, r) => a + r[k], 0);
+    const winner = leaders.length ? esc(leaders.map(r => r.name).join(" & ")) : "No winner";
+    const winSub = leaders.length ? `${plural(top, "net extra image")}${leaders.length > 1 ? " each, shared win" : ""}${settings.prize ? ` · prize: ${esc(settings.prize)}` : ""}` : "Nobody finished the week above their image target.";
+    const pct = (a, b) => b ? Math.round((a / b) * 100) + "%" : "–";
+    const wd = workDaysOf(ws), hols = weekDays(ws).filter(d => holidays.has(d));
+    $("#report").innerHTML = `
+      <div class="report-top">
+        <div><div class="eyebrow">${final ? "Winner" : "Winning so far"}</div><div class="big">${winner}</div><div class="muted">${winSub}</div></div>
+        <div class="stats">
+          <div class="stat"><div class="eyebrow">Working days</div><div class="v">${wd.length}</div></div>
+          <div class="stat"><div class="eyebrow">Images</div><div class="v">${sum("img")} <span class="of">/ ${sum("imgT")}</span></div></div>
+          <div class="stat"><div class="eyebrow">Videos</div><div class="v">${sum("vid")} <span class="of">/ ${sum("vidT")}</span></div></div>
+          <div class="stat"><div class="eyebrow">Team net extra</div><div class="v">${signed(sum("extra"))}</div></div>
+        </div>
+      </div>
+      ${hols.length ? `<div class="legend" style="border-top:0;border-bottom:1px solid var(--line)">Holidays this week: ${hols.map(d => `${esc(holidays.get(d).name)} (${fmt(d)})`).join(", ")}</div>` : ""}
+      <div class="scroll"><table>
+        <thead>
+          <tr><th></th><th class="grp img" colspan="5">Images</th><th class="grp vidh" colspan="3">Videos</th><th class="grp" colspan="3">Extras</th></tr>
+          <tr><th>Designer</th><th class="r">Made</th><th class="r">Target</th><th class="r">On target</th><th class="r">Short</th><th class="r">Missing</th>
+          <th class="r">Made</th><th class="r">Target</th><th class="r">Achieved</th>
+          <th class="r">Earned</th><th class="r">Deducted</th><th class="r">Net</th></tr>
+        </thead>
+        <tbody>${used.map(r => `<tr class="${top > 0 && r.extra === top ? "lead" : ""}">
+          <td>${who(r.id, r.name, r.leaveDays ? `<span class="chip off">${plural(r.leaveDays, "leave day")}</span>` : "")}</td>
+          <td class="r num">${r.img}</td><td class="r num">${r.imgT}</td>
+          <td class="r num">${r.hitDays} <span class="of">days</span></td>
+          <td class="r num ${r.shortDays ? "d-short" : ""}">${r.shortDays} <span class="of">days</span></td>
+          <td class="r num ${r.missDays ? "d-miss" : ""}">${r.missDays || "–"}</td>
+          <td class="r num">${r.vidDays ? r.vid : "–"}</td><td class="r num">${r.vidDays ? r.vidT : "–"}</td>
+          <td class="r num">${pct(r.vid, r.vidT)}</td>
+          <td class="r num d-up">${r.plus ? "+" + r.plus : "0"}</td>
+          <td class="r num ${r.minus ? "d-short" : ""}">${r.minus ? "−" + r.minus : "0"}</td>
+          <td class="r num ${r.extra < 0 ? "d-short" : ""}" style="font-weight:700">${signed(r.extra)}</td></tr>`).join("")}</tbody>
+        <tfoot><tr><td>Team</td><td class="r num">${sum("img")}</td><td class="r num">${sum("imgT")}</td><td class="r num">${sum("hitDays")}</td><td class="r num">${sum("shortDays")}</td><td class="r num">${sum("missDays") || "–"}</td>
+          <td class="r num">${sum("vid")}</td><td class="r num">${sum("vidT")}</td><td class="r num">${pct(sum("vid"), sum("vidT"))}</td>
+          <td class="r num">+${sum("plus")}</td><td class="r num">−${sum("minus")}</td><td class="r num">${signed(sum("extra"))}</td></tr></tfoot>
+      </table></div>`;
+  }
+  $("#report").addEventListener("click", e => { if (e.target.dataset.act === "preview") { previewWeek = weekStart(selDate); renderReport(); } });
+
+  function download(name, text, type) {
+    const blob = new Blob([text], { type });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  $("#csvBtn").onclick = () => {
+    const ws = weekStart(selDate), { used, leaders, days } = reportData(ws);
+    if (!used.length) { toast("Nothing logged this week to export."); return; }
+    const q = v => { const s = String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+    const head = ["Designer", ...days.map((d, i) => `${DOW[i]} ${d} images`), "Images made", "Image target", "Days on target", "Days short", "Days missing", "Leave days",
+      "Videos made", "Video target", "Extras earned", "Extras deducted", "Net extra", "Winner"];
+    const lines = [head, ...used.map(r => [r.name, ...r.cells.map(c => c.rawImg ?? (c.t.type !== "work" ? c.t.type : "")), r.img, r.imgT, r.hitDays, r.shortDays, r.missDays, r.leaveDays,
+      r.vid, r.vidT, r.plus, r.minus, r.extra, leaders.some(l => l.id === r.id) ? "Yes" : ""])];
+    download(`template-count-week-${isoWeek(ws)}-${ws}.csv`, "﻿" + lines.map(l => l.map(q).join(",")).join("\r\n"), "text/csv");
+    toast("CSV downloaded");
+  };
+  $("#printBtn").onclick = () => window.print();
+
+  // ---------- designers ----------
+  function renderDesigners() {
+    keepVal("#newImg", settings.defImg); keepVal("#newVid", settings.defVid);
+    const all = sortedDesigners(true);
+    const tally = new Map(); for (const { st } of finishedWeeks()) for (const r of st.leaders) tally.set(r.id, (tally.get(r.id) || 0) + 1);
+    const key = "d|" + all.map(([id, d]) => id + (d.active !== false)).join("|");
+    if (key !== listKey) {
+      listKey = key;
+      $("#designerList").innerHTML = all.length ? `<table><thead><tr><th>Name</th><th class="r img">Images / day</th><th class="r vidh">Videos / day</th><th class="r">Wins</th><th>Status</th><th></th></tr></thead><tbody>${
+        all.map(([id, d]) => `<tr data-id="${esc(id)}" class="${d.active === false ? "dim" : ""}">
+          <td><div class="who">${av(id, d.name)}<input type="text" id="dn-${esc(id)}" data-kind="name" maxlength="60" aria-label="Name"></div></td>
+          <td class="r"><input type="number" min="0" step="1" id="di-${esc(id)}" data-kind="imageTarget" aria-label="Daily image target for ${esc(d.name)}"></td>
+          <td class="r"><input type="number" min="0" step="1" id="dv-${esc(id)}" data-kind="videoTarget" class="vid" aria-label="Daily video target for ${esc(d.name)}"></td>
+          <td class="r num" id="dw-${esc(id)}"></td>
+          <td>${d.active === false ? '<span class="chip off">Off the board</span>' : '<span class="chip on">Active</span>'}</td>
+          <td class="r"><div class="nav" style="justify-content:flex-end">
+            <button type="button" class="sm" data-act="toggle">${d.active === false ? "Put back" : "Take off board"}</button>
+            <button type="button" class="sm danger" data-act="delete">Delete</button></div></td></tr>`).join("")
+      }</tbody></table>` : `<div class="empty">No designers yet. Add the first one above.</div>`;
+    }
+    for (const [id, d] of all) {
+      keepVal("#dn-" + id, d.name); keepVal("#di-" + id, dImg(id)); keepVal("#dv-" + id, dVid(id));
+      const w = document.getElementById("dw-" + id); if (w) w.textContent = tally.get(id) || "–";
+    }
+  }
+  function keepVal(sel, v) { const el = document.querySelector(sel); if (el && document.activeElement !== el && !el.dataset.dirty) el.value = v; }
+  const toInt = v => { if (v === "" || v == null) return null; const n = Math.floor(Number(v)); return Number.isFinite(n) && n >= 0 ? n : NaN; };
+
+  $("#addForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = $("#newName").value.trim(); const it = toInt($("#newImg").value), vt = toInt($("#newVid").value);
+    if (!name) { toast("Enter the designer's name."); return; }
+    if ([...designers.values()].some(d => d.name.toLowerCase() === name.toLowerCase())) { toast(`${name} is already on the team.`); return; }
+    if (it === null || Number.isNaN(it) || vt === null || Number.isNaN(vt)) { toast("Enter image and video targets, 0 or more."); return; }
+    designers.set(newId("d"), { name, imageTarget: it, videoTarget: vt, active: true, createdAt: Date.now() });
+    $("#newName").value = ""; delete $("#newImg").dataset.dirty; delete $("#newVid").dataset.dirty;
+    commit(`Added ${name}`); $("#newName").focus();
+  });
+  $("#designerList").addEventListener("change", e => {
+    const kind = e.target.dataset.kind; if (!kind) return;
+    const id = e.target.closest("tr").dataset.id, d = designers.get(id); if (!d) return;
+    if (kind === "name") {
+      const name = e.target.value.trim();
+      if (!name) { toast("A name can't be empty."); e.target.value = d.name; return; }
+      designers.set(id, { ...d, name }); commit("Name updated"); return;
+    }
+    const n = toInt(e.target.value);
+    if (n === null || Number.isNaN(n)) { toast("Enter a whole number, 0 or more."); e.target.value = kind === "imageTarget" ? dImg(id) : dVid(id); return; }
+    designers.set(id, { ...d, imageTarget: dImg(id), videoTarget: dVid(id), [kind]: n }); commit("Target updated");
+  });
+  $("#designerList").addEventListener("click", e => {
+    const act = e.target.dataset.act; if (!act) return;
+    const id = e.target.closest("tr").dataset.id, d = designers.get(id); if (!d) return;
+    const before = clone();
+    if (act === "toggle") { designers.set(id, { ...d, active: d.active === false }); commit(d.active === false ? `${d.name} is back on the board` : `${d.name} taken off the board`, before); }
+    if (act === "delete") {
+      const n = [...logs.values()].filter(l => l.designerId === id).length;
+      if (!confirm(`Delete ${d.name} and ${plural(n, "logged day")}? To keep their history, use "Take off board" instead.`)) return;
+      designers.delete(id);
+      for (const [k, l] of logs) if (l.designerId === id) logs.delete(k);
+      for (const [k, l] of leaves) if (l.designerId === id) leaves.delete(k);
+      commit(`Deleted ${d.name}`, before);
+    }
+  });
+
+  // ---------- holidays & leave ----------
+  function renderHolidays() {
+    $("#offDays").innerHTML = DOWL.map((n, i) => `<label><input type="checkbox" data-dow="${i}" ${settings.offDays.includes(i) ? "checked" : ""}> ${n}</label>`).join("");
+    if (!$("#holFrom").value) $("#holFrom").value = today;
+    if (!$("#lvFrom").value) $("#lvFrom").value = today;
+    const sel = $("#lvWho"), cur = sel.value;
+    sel.innerHTML = sortedDesigners(false).map(([id, d]) => `<option value="${esc(id)}">${esc(d.name)}</option>`).join("") || `<option value="">Add designers first</option>`;
+    if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+
+    // group consecutive holiday dates with the same name
+    const hs = [...holidays.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    const groups = [];
+    for (const [date, h] of hs) { const g = groups[groups.length - 1];
+      if (g && g.name === h.name && addDays(g.to, 1) === date) { g.to = date; g.dates.push(date); } else groups.push({ name: h.name, from: date, to: date, dates: [date] }); }
+    groups.sort((a, b) => (a.to < today) - (b.to < today) || (a.to < today ? b.from.localeCompare(a.from) : a.from.localeCompare(b.from)));
+    $("#holList").innerHTML = groups.length ? `<ul class="list">${groups.map(g => `<li class="${g.to < today ? "past" : ""}">
+      <div style="min-width:0"><div class="t">${esc(g.name)}</div><div class="hint">${range(g.from, g.to)}${g.dates.length > 1 ? ` · ${g.dates.length} days` : ` · ${DOWL[dow(g.from)]}`}</div></div>
+      <button type="button" class="sm ghost danger" data-hol="${g.dates.join(",")}">Remove</button></li>`).join("")}</ul>`
+      : `<div class="empty">No company holidays added yet.</div>`;
+
+    const ls = [...leaves.entries()].filter(([, l]) => designers.has(l.designerId))
+      .sort((a, b) => (a[1].to < today) - (b[1].to < today) || a[1].from.localeCompare(b[1].from));
+    $("#leaveList").innerHTML = ls.length ? `<ul class="list">${ls.map(([id, l]) => `<li class="${l.to < today ? "past" : ""}">
+      <div style="min-width:0">${who(l.designerId, designers.get(l.designerId).name)}<div class="hint">${range(l.from, l.to)}${l.reason ? " · " + esc(l.reason) : ""}</div></div>
+      <button type="button" class="sm ghost danger" data-leave="${esc(id)}">Remove</button></li>`).join("")}</ul>`
+      : `<div class="empty">No leave added yet. You can also mark leave straight from the daily log.</div>`;
+  }
+  $("#offDays").addEventListener("change", e => {
+    const i = Number(e.target.dataset.dow); if (!Number.isInteger(i)) return;
+    const set = new Set(settings.offDays); e.target.checked ? set.add(i) : set.delete(i);
+    if (set.size === 7) { e.target.checked = false; toast("At least one day has to be a working day."); return; }
+    const before = clone(); settings = { ...settings, offDays: [...set].sort() }; commit("Weekly off days updated", before);
+  });
+  function datesIn(from, to) { const out = []; for (let d = from; d <= to && out.length < 366; d = addDays(d, 1)) out.push(d); return out; }
+  $("#holForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = $("#holName").value.trim(), from = $("#holFrom").value, to = $("#holTo").value || from;
+    if (!name || !isYmd(from) || !isYmd(to)) { toast("Enter a name and a date."); return; }
+    if (to < from) { toast("The end date is before the start date."); return; }
+    const before = clone(); const ds = datesIn(from, to);
+    ds.forEach(d => holidays.set(d, { name }));
+    $("#holName").value = ""; $("#holTo").value = "";
+    commit(`${name} added (${plural(ds.length, "day")})`, before);
+  });
+  $("#holList").addEventListener("click", e => {
+    const ds = e.target.dataset.hol; if (!ds) return;
+    const before = clone(); const name = holidays.get(ds.split(",")[0])?.name || "Holiday";
+    ds.split(",").forEach(d => holidays.delete(d)); commit(`${name} removed`, before);
+  });
+  $("#leaveForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const did = $("#lvWho").value, from = $("#lvFrom").value, to = $("#lvTo").value || from, reason = $("#lvReason").value.trim();
+    if (!designers.has(did)) { toast("Add designers first."); return; }
+    if (!isYmd(from) || !isYmd(to)) { toast("Enter the leave date."); return; }
+    if (to < from) { toast("The end date is before the start date."); return; }
+    const before = clone(); leaves.set(newId("l"), { designerId: did, from, to, reason });
+    $("#lvReason").value = ""; $("#lvTo").value = "";
+    commit(`Leave added for ${designers.get(did).name}`, before);
+  });
+  $("#leaveList").addEventListener("click", e => {
+    const id = e.target.dataset.leave; if (!id) return;
+    const before = clone(); leaves.delete(id); commit("Leave removed", before);
+  });
+
+  // ---------- settings ----------
+  function renderSettings() {
+    keepVal("#prizeIn", settings.prize); keepVal("#defImg", settings.defImg); keepVal("#defVid", settings.defVid);
+    $("#optHolWork").checked = settings.holidayWorkCounts;
+    $("#optMissing").checked = settings.missingAsZero;
+    $("#lastBackup").textContent = prefs.lastBackup ? `Last backup: ${fmtY(prefs.lastBackup)}` : "No backup yet";
+    if (API) $("#backupText").textContent = "Everything is saved in the online database, so the whole team sees the same board. Download a copy now and then for your records. Load backup replaces the online data with the file, which is how you move counts over from the offline version.";
+  }
+  ["#prizeIn", "#defImg", "#defVid", "#newImg", "#newVid"].forEach(s => $(s).addEventListener("input", e => e.target.dataset.dirty = "1"));
+  $("#setForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const a = toInt($("#defImg").value), b = toInt($("#defVid").value);
+    if (a === null || Number.isNaN(a) || b === null || Number.isNaN(b)) { toast("Enter default targets, 0 or more."); return; }
+    ["#prizeIn", "#defImg", "#defVid"].forEach(s => delete $(s).dataset.dirty);
+    settings = { ...settings, prize: $("#prizeIn").value.trim(), defImg: a, defVid: b };
+    commit("Settings saved");
+  });
+  $("#optHolWork").onchange = e => { settings = { ...settings, holidayWorkCounts: e.target.checked }; commit("Rule updated"); };
+  $("#optMissing").onchange = e => { settings = { ...settings, missingAsZero: e.target.checked }; commit("Rule updated"); };
+
+  function exportBackup() {
+    prefs = { ...prefs, lastBackup: today }; savePrefs();
+    download(`template-count-backup-${today}.json`, JSON.stringify(snapshot(), null, 2), "application/json");
+    render(); toast("Backup downloaded");
+  }
+  $("#exportBtn").onclick = exportBackup;
+  $("#backupNag").addEventListener("click", e => { if (e.target.dataset.act === "backup") exportBackup(); });
+  $("#importBtn").onclick = () => $("#importFile").click();
+  $("#importFile").addEventListener("change", e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const obj = JSON.parse(r.result);
+        if (obj?.app !== "template-count-board") throw new Error();
+        if (!confirm("Loading this backup replaces everything on this page. Continue?")) return;
+        const before = clone(); loadState(obj); commit("Backup loaded", before);
+      } catch { toast("That file isn't a Template Count Board backup."); }
+      finally { e.target.value = ""; }
+    };
+    r.readAsText(f);
+  });
+  $("#resetBtn").onclick = () => {
+    if (!confirm(`Delete all designers, counts, holidays and leave${API ? " for everyone" : " on this computer"}? This can't be undone after you leave the page.`)) return;
+    const before = clone(); loadState({}); commit("All data deleted", before);
+  };
+
+  // ---------- theme ----------
+  function applyTheme() {
+    const t = prefs.theme;
+    if (t === "system") document.documentElement.removeAttribute("data-theme"); else document.documentElement.dataset.theme = t;
+    $("#themeBtn").textContent = `Theme: ${t[0].toUpperCase() + t.slice(1)}`;
+  }
+  $("#themeBtn").onclick = () => {
+    const order = ["system", "light", "dark"];
+    prefs = { ...prefs, theme: order[(order.indexOf(prefs.theme) + 1) % 3] };
+    savePrefs(); applyTheme();
+  };
+
+  // ---------- navigation ----------
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-week],[data-day]"); if (!b) return;
+    if (b.dataset.week !== undefined) { const n = Number(b.dataset.week); selDate = n === 0 ? today : addDays(selDate, 7 * n); }
+    else { const n = Number(b.dataset.day); selDate = n === 0 ? today : addDays(selDate, n); }
+    render();
+  });
+  $("#datePick").addEventListener("change", e => { if (isYmd(e.target.value)) { selDate = e.target.value; render(); } });
+  document.addEventListener("keydown", e => {
+    if (e.target.closest("input,select,textarea,button") || e.ctrlKey || e.metaKey || e.altKey) return;
+    const step = view === "log" ? 1 : 7;
+    if (e.key === "ArrowLeft" && ["log", "overview", "report"].includes(view)) { selDate = addDays(selDate, -step); render(); }
+    else if (e.key === "ArrowRight" && ["log", "overview", "report"].includes(view)) { selDate = addDays(selDate, step); render(); }
+    else if (e.key.toLowerCase() === "t") { selDate = today; render(); }
+  });
+
+  applyTheme();
+  if (API) boot(); else route();
+})();
+</script>
+</body>
+</html>
